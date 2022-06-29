@@ -14,58 +14,54 @@
 data {
   int<lower=1> G; // # of games played during the 2020 Bundesliga season
   int<lower=2> T; // number of teams in Bundesliga
-  array[G] int xh; // hosting team identities
-  array[G] int xv; // visitor identities
+  int xh[G]; // hosting team identities
+  int xv[G]; // visitor identities
   //==========================
-  array[G] int yh; // host goals
-  array[G] int yg; // guest goals
+  int yh[G]; // host goals
+  int yv[G]; // guest goals
   //==========================
-  array<lower=1, upper=2>[G] int COV; // indicating games played pre or after COVID breakout
+  int<lower=1, upper=2> COV[G]; // indicating games played pre or after COVID breakout
 }
 
 // The parameters accepted by the model. 
 parameters {
 
-  //real muo;
-  //real mud;
-  //real <lower=0> sigmao;
-  //real <lower=0> sigmal;
-  //real <lower=0> sigmac;  
+  real mu_O;
+  real mu_D;
+  real <lower=0> sigma_O;
+  real <lower=0> sigma_D; 
   
-//   real hfas[2];
-//   vector[nt] off; // team offensive capabilities
-//   vector[nt] dff; // team defensive capabilities
+  vector[2] delta; // HFA 0 regular and 1 for under pandemic influence
+  vector[T] lambda_O_t; // team offensive capabilities
+  vector[T] lambda_D_t; // team defensive capabilities
 }
 
 transformed parameters{
 //   real hfa_d;
-//   real<lower=0> theta_v[ng];
-//   real<lower=0> theta_h[ng];
+vector<lower=0>[G] theta_V;
+vector<lower=0>[G] theta_H;
   
   
 //   hfa_d = hfas[1]-hfas[2];
   
-//   for (i in 1:ng){
-//     theta_v[i] = exp(off[vt[i]]+dff[ht[i]]);
-//     theta_h[i] = exp(hfas[cv[i]] + off[ht[i]]+dff[vt[i]]);
-//   }
+  for (i in 1:G){
+    theta_V[i] = exp(lambda_D_t[xv[i]]+lambda_D_t[xh[i]]);
+    theta_H[i] = exp(delta[COV[i]] + lambda_O_t[xh[i]]+lambda_D_t[xv[i]]);
+  }
 }
 // The model to be estimated. We model the output
 // 'y' to be normally distributed with mean 'mu'
 // and standard deviation 'sigma'.
 model {
 
-  //muo ~ cauchy(0, 2);
-  //mud ~ cauchy(0, 2);
-  //sigmao ~ gamma(1, 1);
-//   off ~ normal(0, 1);
-//   dff ~ normal(0, 1);
-//   //hfas ~ normal(0,1);
-//   //hfal ~ normal(0,1);
-//   hfas ~ normal(0,1);
+// priors
+mu_O ~ normal(0, 2);
+mu_D ~ normal(0, 2);
+delta ~ normal(0, 0.1);
+sigma_O ~ gamma(1, 1);
+sigma_D ~ gamma(1, 1);
+// logNormal part of the model
 
-//   vg ~ poisson(theta_v);
-//   hg ~ poisson(theta_h);
 }
 //==============================
 generated quantities {
