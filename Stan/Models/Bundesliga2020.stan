@@ -41,12 +41,9 @@ transformed parameters{
 vector<lower=0>[G] theta_V;
 vector<lower=0>[G] theta_H;
   
-  
-//   hfa_d = hfas[1]-hfas[2];
-  
   for (i in 1:G){
-    theta_V[i] = exp(lambda_D_t[xv[i]]+lambda_D_t[xh[i]]);
-    theta_H[i] = exp(delta[COV[i]] + lambda_O_t[xh[i]]+lambda_D_t[xv[i]]);
+    theta_V[i] = exp(lambda_O_t[xv[i]] - lambda_D_t[xh[i]]);
+    theta_H[i] = exp(delta[COV[i]] + lambda_O_t[xh[i]] - lambda_D_t[xv[i]]);
   }
 }
 // The model to be estimated. We model the output
@@ -55,12 +52,17 @@ vector<lower=0>[G] theta_H;
 model {
 
 // priors
-mu_O ~ normal(0, 2);
-mu_D ~ normal(0, 2);
+mu_O ~ normal(0, 0.1);
+mu_D ~ normal(0, 0.1);
 delta ~ normal(0, 0.1);
-sigma_O ~ gamma(1, 1);
-sigma_D ~ gamma(1, 1);
+sigma_O ~ gamma(0.05, 0.05);
+sigma_D ~ gamma(0.05, 0.05);
 // logNormal part of the model
+lambda_O_t ~ normal(mu_O, sigma_O);
+lambda_D_t ~ normal(mu_D, sigma_D);
+
+yh ~ poisson(theta_H);
+yv ~ poisson(theta_V);
 
 }
 //==============================
