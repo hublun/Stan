@@ -67,8 +67,10 @@ yv ~ poisson(theta_V);
 }
 //==============================
 generated quantities {
-  //int yp[N];
-  /*for (i in 1:N){
-    yp[i] = poisson_rng(theta_h[i]) - poisson_rng(theta_g[i]);    
-  }*/
+  int yp_H[G];
+  int yp_V[G];
+  //for (i in 1:N){
+  yp_H = poisson_rng(theta_H); 
+  yp_V = poisson_rng(theta_V);    
+  //}
 }
