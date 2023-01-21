@@ -29,5 +29,18 @@ model {
    /* ... declarations ... statements ... */
     g1_betas ~ normal(0, beta_sigma);
     g2_betas ~ normal(0, beta_sigma);
-    
+
+    for (n in 1:N){
+        gammas[n,] ~  normal(rep_vector(0, K), 1);
+    }
+    for (j in 1:J){
+        deltas[j,] ~ normal(rep_vector(0, K), 1);
+    }
+
+    y ~ normal(linear_predictors, y_sigma);
+}
+
+generated quantities {
+    real y_pred[(N*J)];
+    y_pred = normal_rng(linear_predictors, y_sigma);
 }

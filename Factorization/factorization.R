@@ -14,14 +14,14 @@ fit <- sampling(object = model,
                 init = "random",
                 control = list(adapt_delta = 0.95),
                 chains = 4,
-                iter = 500,
-                warmup = 300,
-                thin = 2,
+                iter = 3000,
+                warmup = 2200,
+                thin = 1,
                 verbose = TRUE)
 #=================================================
 summary(fit)
 names(fit)
-traceplot(fit, pars=c("gammas[1,1]"))
+traceplot(fit, pars=c("gammas[1,2]"))
 #-------------------------------------------------
 theme_Posterior = theme(
   axis.line.x = element_line(arrow=arrow(length=unit(0.05, "cm")), lineend = "butt"),
@@ -38,10 +38,23 @@ theme_Posterior = theme(
 )
 #---------------------------
 plot(fit,
-     pars = names(fit)[c(111:133)],
+     pars = names(fit)[c(141:171)],
      show_density = FALSE,
      fill_color = "#998811",
      est_color = "#ffffff",
      ci_level = 0.9, outer_level=0.95) +
   geom_vline(xintercept = 0, linetype = 3, linewidth = 0.5) + 
   theme_Posterior
+#----------------------------
+library(bayesplot)
+color_scheme_set('viridisA')
+bayesplot_theme_set(theme_classic())
+
+draws = extract(fit)
+y = data_list$y
+yrep = draws$y_pred
+dim(yrep)
+
+ppc_dens_overlay(y=y, yrep = yrep)
+ppc_ribbon(y[1:20], yrep[,1:20], prob_outer = 0.95, prob = 0.5, alpha = 0.4)
+ppc_intervals(y[1:2], yrep[,1:2], linewidth = 1)
