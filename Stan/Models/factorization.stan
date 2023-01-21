@@ -29,4 +29,5 @@ model {
    /* ... declarations ... statements ... */
     g1_betas ~ normal(0, beta_sigma);
     g2_betas ~ normal(0, beta_sigma);
+    
 }
