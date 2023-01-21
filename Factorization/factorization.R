@@ -38,7 +38,7 @@ theme_Posterior = theme(
 )
 #---------------------------
 plot(fit,
-     pars = names(fit)[c(1:20)],
+     pars = names(fit)[c(111:133)],
      show_density = FALSE,
      fill_color = "#998811",
      est_color = "#ffffff",
