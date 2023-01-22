@@ -6,7 +6,8 @@ data_list <- readRDS(file = paste0(getwd(),'/Documents/Github' ,
                           '/Stan/Factorization/data_list.rds', sep = ""))
 #-----------------------------------
 remove(model)
-model = stan_model(paste0(getwd(),'/Documents/Github' ,'/Stan/Stan/Models/factorization.stan'))
+model = stan_model(paste0(getwd(),'/Documents/Github' ,
+                          '/Stan/Stan/Models/factorization_mvn.stan'))
 #-----------------------------------
 remove(fit)
 fit <- sampling(object = model,
