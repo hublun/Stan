@@ -1,0 +1,72 @@
+//
+// This Stan program defines a simple model, with a
+// vector of values 'y' modeled as normally distributed
+// with mean 'mu' and standard deviation 'sigma'.
+//
+// Learn more about model development with Stan at:
+//
+//    http://mc-stan.org/users/interfaces/rstan.html
+//    https://github.com/stan-dev/rstan/wiki/RStan-Getting-Started
+//
+
+// The input data is a vector 'y' of length 'N'.
+data {
+  int<lower=0> N; // # of observations
+  int yg[N]; // MGG
+  int yh[N]; // home MHG
+  int L; // numer of leagues
+  int xl[N];// league index
+  int C; // number of clubs
+  int xc[N]; // club index
+}
+
+// The parameters accepted by the model. Our model
+// accepts two parameters 'mu' and 'sigma'.
+parameters {
+  vector[L] hfa;
+  //real muh;
+  //real <lower=0> tauh;
+  real mu_att;
+  real <lower=0> tau_att;
+  vector[C] att;
+
+}
+
+transformed parameters{
+  real<lower=0> theta_g[N];
+  real<lower=0> theta_h[N];
+  vector[C] att_star;
+
+  for (i in 1:C){
+    att_star[i] = att[i]; //- mean(att);
+  }
+  
+  for (i in 1:N){
+    theta_g[i] = exp(att_star[xc[i]]);
+    theta_h[i] = exp(hfa[xl[i]] + att_star[xc[i]]);
+  }
+  
+}
+// The model to be estimated. We model the output
+// 'y' to be normally distributed with mean 'mu'
+// and standard deviation 'sigma'.
+model {
+  //muh ~ normal(0, 1);
+  //tauh ~ gamma(2, 2);
+  mu_att ~ normal(1, 1);
+  tau_att ~ gamma(2, 2);
+
+  hfa ~ normal(0, 1);
+  att ~ normal(mu_att, tau_att);
+
+  yg ~ poisson(theta_g);
+  yh ~ poisson(theta_h);
+}
+
+//==============================
+generated quantities {
+  int yp[N];
+  for (i in 1:N){
+    yp[i] = poisson_rng(theta_h[i]) - poisson_rng(theta_g[i]);    
+  }
+}
