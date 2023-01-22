@@ -19,7 +19,7 @@ parameters {
 
 transformed parameters {
     /* ... declarations ... statements ... */
-    real linear_predictors[(N*J)];
+    vector[N*J] linear_predictors;
     for (i in 1: N*J){
         linear_predictors[i] = g1_betas[X[i,1]] + g2_betas[X[i,2]] + (gammas[X[i,1]] * deltas[X[i,2]]');
     }
@@ -41,6 +41,8 @@ model {
 }
 
 generated quantities {
-    real y_pred[(N*J)];
+    real y_pred[N*J];
+    real mse;
     y_pred = normal_rng(linear_predictors, y_sigma);
+    mse =squared_distance(to_vector(y_pred), y) / (N*J);
 }

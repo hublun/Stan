@@ -14,8 +14,8 @@ fit <- sampling(object = model,
                 init = "random",
                 control = list(adapt_delta = 0.95),
                 chains = 4,
-                iter = 3000,
-                warmup = 2200,
+                iter = 999,
+                warmup = 666,
                 thin = 1,
                 verbose = TRUE)
 #=================================================
@@ -44,6 +44,15 @@ plot(fit,
      est_color = "#ffffff",
      ci_level = 0.9, outer_level=0.95) +
   geom_vline(xintercept = 0, linetype = 3, linewidth = 0.5) + 
+  theme_Posterior
+
+plot(fit,
+     pars = c("mse"),
+     show_density = TRUE,
+     fill_color = "#998811",
+     est_color = "#ffffff",
+     ci_level = 0.9, outer_level=0.95) +
+  #geom_vline(xintercept = 0, linetype = 3, linewidth = 0.5) + 
   theme_Posterior
 #----------------------------
 library(bayesplot)
