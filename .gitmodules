@@ -1,3 +1,9 @@
 [submodule "covid19_soccer"]
 	path = covid19_soccer
 	url = https://github.com/Priesemann-Group/covid19_soccer
+[submodule "baad"]
+	path = baad
+	url = https://github.com/wds15/baad
+[submodule "MPP_longitudinal"]
+	path = MPP_longitudinal
+	url = https://github.com/QiHongchao/MPP_longitudinal
