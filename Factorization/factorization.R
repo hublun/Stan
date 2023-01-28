@@ -1,26 +1,35 @@
+library(dplyr)
 library(rstan)
+library(bayesplot)
+library(Metrics)
 options(mc.cores = parallel::detectCores())
 rstan_options(auto_write = TRUE)
-
-data_list <- readRDS(file = paste0(getwd(),'/Documents/Github' ,
+#========================================================================
+data_list <- readRDS(file = paste0(getwd(),'/Documents/Github',
                           '/Stan/Factorization/data_list.rds', sep = ""))
-#-----------------------------------
+#------------------------------------------------------------------------
 remove(model)
 model = stan_model(paste0(getwd(),'/Documents/Github' ,
-                          '/Stan/Stan/Models/factorization_mvn.stan'))
-#-----------------------------------
+                          '/Stan/RStan/Models/factorization_mvn.stan'))
+#------------------------------------------------------------------------
 remove(fit)
 fit <- sampling(object = model,
                 data = data_list,
                 init = "random",
                 control = list(adapt_delta = 0.95),
                 chains = 4,
-                iter = 999,
-                warmup = 666,
+                iter = 888,
+                warmup = 555,
                 thin = 1,
                 verbose = TRUE)
 #=================================================
-summary(fit)
+
+s <- summary(fit)
+dfs <- data.frame(s$summary)
+
+result <- filter(dfs, Rhat > 2.2)
+row.names(result)
+
 names(fit)
 traceplot(fit, pars=c("gammas[1,2]"))
 #-------------------------------------------------
@@ -39,7 +48,16 @@ theme_Posterior = theme(
 )
 #---------------------------
 plot(fit,
-     pars = names(fit)[c(141:171)],
+     pars = names(fit)[c(1:3)],
+     show_density = FALSE,
+     fill_color = "#998811",
+     est_color = "#ffffff",
+     ci_level = 0.9, outer_level=0.95) +
+  geom_vline(xintercept = 0, linetype = 3, linewidth = 0.5) + 
+  theme_Posterior
+
+plot(fit,
+     pars = c('g2_betas'),
      show_density = FALSE,
      fill_color = "#998811",
      est_color = "#ffffff",
@@ -55,8 +73,17 @@ plot(fit,
      ci_level = 0.9, outer_level=0.95) +
   #geom_vline(xintercept = 0, linetype = 3, linewidth = 0.5) + 
   theme_Posterior
+
+plot(fit,
+     pars = c("factor_sigma"),
+     show_density = TRUE,
+     fill_color = "#998811",
+     est_color = "#ffffff",
+     ci_level = 0.9, outer_level=0.95) +
+  #geom_vline(xintercept = 0, linetype = 3, linewidth = 0.5) + 
+  theme_Posterior
 #----------------------------
-library(bayesplot)
+
 color_scheme_set('viridisA')
 bayesplot_theme_set(theme_classic())
 
@@ -68,3 +95,10 @@ dim(yrep)
 ppc_dens_overlay(y=y, yrep = yrep)
 ppc_ribbon(y[1:20], yrep[,1:20], prob_outer = 0.95, prob = 0.5, alpha = 0.4)
 ppc_intervals(y[1:2], yrep[,1:2], linewidth = 1)
+#========= MSE ===========
+mses = c()
+for (i in 1:dim(yrep)[1]){
+    mses<-c(mses, mse(data_list$y, yrep[i,]))
+  }
+rmse = sqrt(mean(mses))
+rmse
