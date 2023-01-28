@@ -22,17 +22,17 @@ parameters {
     //--------------- mvn --------------
     real<lower=0> gamma_sigma_prior;
     real<lower=0> gamma_omega_prior;
-    matrix[N, K] gamma_mu;
+    vector[K] gamma_mu;
     vector<lower=0>[K] gamma_sigma;
     cholesky_factor_corr[K] gamma_omega;
-    //matrix[K, N] gamma_a;
+    matrix[N, K] gammas;
     
     //---------------------------------
 }
 
 transformed parameters {
     /* ... declarations ... statements ... */
-    matrix[N, K] gammas;
+    //matrix[N, K] gammas;
 
     vector[N*J] linear_predictors;
     
@@ -54,13 +54,14 @@ model {
     gamma_sigma_prior ~ gamma(1, 0.1);
     gamma_sigma ~ normal(0, gamma_sigma_prior);
     gamma_omega_prior ~ gamma(1, 0.1);
-    gamma_omega ~ lkj_corr_cholesky(2);    
-
+    gamma_omega ~ lkj_corr_cholesky(gamma_omega_prior);    
+    //print(gamma_omega);
     //to_vector(gamma_a) ~ std_normal();
     //-------------
+    gamma_mu ~ normal(0, 0.1);
+    
     for (n in 1:N){
-      gamma_mu[n,] ~ normal(0,1);
-      gammas[n,] ~ multi_normal_cholesky(gamma_mu[n,], gamma_omega);
+      gammas[n,] ~ multi_normal_cholesky(gamma_mu, gamma_omega);
     }
     //-------------------------------
     for (j in 1:J){
