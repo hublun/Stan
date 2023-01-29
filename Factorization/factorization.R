@@ -27,11 +27,11 @@ fit <- sampling(object = model,
 s <- summary(fit)
 dfs <- data.frame(s$summary)
 
-result <- filter(dfs, Rhat > 2.2)
+result <- filter(dfs, Rhat > 1.1)
 row.names(result)
 
 names(fit)
-traceplot(fit, pars=c("gammas[1,2]"))
+traceplot(fit, pars=c("delta_mu"))
 #-------------------------------------------------
 theme_Posterior = theme(
   axis.line.x = element_line(arrow=arrow(length=unit(0.05, "cm")), lineend = "butt"),
@@ -57,7 +57,7 @@ plot(fit,
   theme_Posterior
 
 plot(fit,
-     pars = c('g2_betas'),
+     pars = c('delta_sigma'),
      show_density = FALSE,
      fill_color = "#998811",
      est_color = "#ffffff",
@@ -75,7 +75,7 @@ plot(fit,
   theme_Posterior
 
 plot(fit,
-     pars = c("factor_sigma"),
+     pars = c("delta_omega_prior", 'gamma_omega_prior'),
      show_density = TRUE,
      fill_color = "#998811",
      est_color = "#ffffff",
@@ -102,3 +102,4 @@ for (i in 1:dim(yrep)[1]){
   }
 rmse = sqrt(mean(mses))
 rmse
+#===========================================
