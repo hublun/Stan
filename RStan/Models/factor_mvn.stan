@@ -8,6 +8,7 @@ data {
 
 parameters {
     /* ... declarations ... */
+    
 }
 
 transformed parameters {
