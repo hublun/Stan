@@ -6,11 +6,11 @@ options(mc.cores = parallel::detectCores())
 rstan_options(auto_write = TRUE)
 #========================================================================
 data_list <- readRDS(file = paste0(getwd(),'/Documents/Github',
-                          '/Stan/Factorization/data_list.rds', sep = ""))
+                          '/Stan/Factorization/factor_data_list.rds', sep = ""))
 #------------------------------------------------------------------------
 remove(model)
 model = stan_model(paste0(getwd(),'/Documents/Github' ,
-                          '/Stan/RStan/Models/factorization_mvn.stan'))
+                          '/Stan/RStan/Models/factor_mvn.stan'))
 #------------------------------------------------------------------------
 remove(fit)
 fit <- sampling(object = model,
