@@ -6,9 +6,14 @@ data {
     matrix[N, P] Y;   // data
 }
 
+transformed data {
+    int<lower=1> M;
+    M = L*(P-L) + L*(L-1) /2; // number of non-zero loadings
+}
+
 parameters {
     /* ... declarations ... */
-    
+    vector[M] L_t; // lower diagonal elements of L
 }
 
 transformed parameters {

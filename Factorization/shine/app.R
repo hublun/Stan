@@ -13,7 +13,7 @@ library(shiny)
 ui <- fluidPage(
 
     # Application title
-    titlePanel("Old Faithful Geyser Data"),
+    titlePanel("DRC Lab Products"),
 
     # Sidebar with a slider input for number of bins 
     sidebarLayout(
@@ -42,8 +42,8 @@ server <- function(input, output) {
 
         # draw the histogram with the specified number of bins
         hist(x, breaks = bins, col = 'darkgray', border = 'white',
-             xlab = 'Waiting time to next eruption (in mins)',
-             main = 'Histogram of waiting times')
+             xlab = 'Feature Factor Loadings',
+             main = 'Just Load Mey')
     })
 }
 
