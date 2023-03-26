@@ -13,7 +13,8 @@ transformed data {
 
 parameters {
     /* ... declarations ... */
-    vector[M] L_t; // lower diagonal elements of L
+    vector[M] L_t; // lower diagonal elements of L_t
+    vector<lower = 0>[L] L_d; // lower diagonal elements of L-d 
 }
 
 transformed parameters {
