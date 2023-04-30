@@ -5,11 +5,17 @@ library(Metrics)
 options(mc.cores = parallel::detectCores())
 rstan_options(auto_write = TRUE)
 #========================================================================
-data_list <- readRDS(file = paste0(getwd(),#'/Documents/Github',
+data_list <- readRDS(file = paste0(getwd(),'/Documents/Github',
                           '/Stan/Factorization/factor_data_list.rds', sep = ""))
+
+data_list$N
+data_list$P
+data_list$D
+data_list$Y
+
 #------------------------------------------------------------------------
 remove(model)
-model = stan_model(paste0(getwd(),#'/Documents/Github' ,
+model = stan_model(paste0(getwd(),'/Documents/Github' ,
                           '/Stan/RStan/Models/factor_mvn.stan'))
 #------------------------------------------------------------------------
 remove(fit)
@@ -17,10 +23,10 @@ fit <- sampling(object = model,
                 data = data_list,
                 init = "random",
                 control = list(adapt_delta = 0.95),
-                chains = 4,
-                iter = 888,
-                warmup = 555,
-                thin = 1,
+                chains = 1,
+                iter = 1,
+                #warmup = 555,
+                #thin = 1,
                 verbose = TRUE)
 #=================================================
 

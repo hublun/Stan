@@ -16,7 +16,7 @@ transformed data {
 parameters {
     /* ... declarations ... */
     vector[M] L_t; // lower diagonal elements of L_t
-    vector<lower = 0>[D] L_d; // lower diagonal elements of L-d
+    vector<lower = 0>[D] L_d; // lower diagonal elements of L_d
     vector<lower=0>[P] psi; // vector of variance
     real<lower=0> mu_psi;
     real<lower=0> sigma_psi;
@@ -30,33 +30,46 @@ transformed parameters {
   cov_matrix[P] Q; // Covariance mat
   //---------
   {
-    int idx1;
-    int idx2;
+    int idx1 = 0;
+    int idx2 = 0;
     real zero;
     zero = 0;
     for (i in 1:P){
       for (j in (i+1):D){
         idx1 = idx1 +1;
         L[i,j] = zero;
+        //print(idx1)
       }
     }
-    //------
+    //---------------------
     for (j in 1:D){
       L[j,j] = L_d[j];
       for (i in (j+1):P){
         idx2 = idx2 +1;
         L[i,j] = L_t[idx2];
+        
       }
     }
-    
+    //---------------------
   }
   //---------
+  Q = L*L' + diag_matrix(psi);
 }
 
 model {
-   /* ... declarations ... statements ... */
-
-    //-------------------------------------
+    /* ...  hyperpriors ... */
+    mu_psi ~ cauchy(0,1);
+    sigma_psi ~ cauchy(0,1);
+    mu_lt ~ cauchy(0,1);
+    sigma_lt ~ cauchy(0,1);
+    /* ... the priors ... */
+    L_d ~ cauchy(0,3);
+    L_t ~ cauchy(mu_lt, sigma_lt);
+    psi ~ cauchy(mu_psi, sigma_psi);
+    /** ... likelihood ... */
+    for (j in 1:N){
+      Y[j] ~ multi_normal(mu, Q);
+    }
 }
 
 generated quantities {
