@@ -18,26 +18,35 @@ remove(model)
 model = stan_model(paste0(getwd(),'/Documents/Github' ,
                           '/Stan/RStan/Models/factor_mvn.stan'))
 #------------------------------------------------------------------------
+init_func <- fun(){
+  init.values <- list(
+    L_t <- rep(0, 24) + runif(1, -.1, .1),
+    L_d <- rep(.5, D) + runif(1, -.1, .1),
+  )
+  
+  return(init.values);
+}
+#--------------------------------
 remove(fit)
 fit <- sampling(object = model,
                 data = data_list,
                 init = "random",
                 control = list(adapt_delta = 0.95),
-                chains = 1,
-                iter = 1,
-                #warmup = 555,
-                #thin = 1,
+                chains = 4,
+                iter = 888,
+                warmup = 555,
+                thin = 1,
                 verbose = TRUE)
 #=================================================
 
 s <- summary(fit)
 dfs <- data.frame(s$summary)
 
-result <- filter(dfs, Rhat > 1.1)
+result <- filter(dfs, Rhat > 5.5)
 row.names(result)
 
 names(fit)
-traceplot(fit, pars=c("delta_mu"))
+traceplot(fit, pars=c("L_t"))
 #-------------------------------------------------
 theme_Posterior = theme(
   axis.line.x = element_line(arrow=arrow(length=unit(0.05, "cm")), lineend = "butt"),
@@ -63,7 +72,7 @@ plot(fit,
   theme_Posterior
 
 plot(fit,
-     pars = c('delta_sigma'),
+     pars = c('L_d'),
      show_density = FALSE,
      fill_color = "#998811",
      est_color = "#ffffff",
