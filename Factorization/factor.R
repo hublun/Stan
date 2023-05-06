@@ -20,20 +20,20 @@ model = stan_model(paste0(getwd(),'/Documents/Github' ,
 #------------------------------------------------------------------------
 init_func <- function(D, P) {
   init.values <- list(
-    L_t = list(rep(0, 24) + runif(1, -.1, .1)),
-    L_d = list(rep(.5, D) + runif(1, -.1, .1)),
-    psi = list(rep(.2, P) + runif(1,-.1,.1)),
-    sigma_psi = list(0.15 + runif(1,-.1,.1)),
-    mu_psi = list(0.2 + runif(1, -.1, .1)),
-    sigma_lt = list(0.5 + runif(1, -.1,.1)),
-    mu_lt = list(0.0 + runif(1, -.1,.1))
+    list(L_t = rep(0, 24) + runif(1, -.1, .1)),
+    list(L_d = rep(.5, D) + runif(1, -.1, .1)),
+    list(psi = rep(.2, P) + runif(1,-.1,.1)),
+    list(sigma_psi = 0.15 + runif(1,-.1,.1)),
+    list(mu_psi = 0.2 + runif(1, -.1, .1)),
+    list(sigma_lt = 0.5 + runif(1, -.1,.1)),
+    list(mu_lt = 0.0 + runif(1, -.1,.1))
   )
   
   return(init.values);
 }
 
 value <- init_func(data_list$D, data_list$P)
-class(value$L_t)
+value
 #--------------------------------
 remove(fit)
 fit <- sampling(object = model,
@@ -54,7 +54,7 @@ result <- filter(dfs, Rhat > 5.5)
 row.names(result)
 
 names(fit)
-traceplot(fit, pars=c("L_t"))
+traceplot(fit, pars=c("L_d"))
 #-------------------------------------------------
 theme_Posterior = theme(
   axis.line.x = element_line(arrow=arrow(length=unit(0.05, "cm")), lineend = "butt"),
@@ -71,7 +71,7 @@ theme_Posterior = theme(
 )
 #---------------------------
 plot(fit,
-     pars = names(fit)[c(1:3)],
+     pars = names(fit)[c(1:24)],
      show_density = FALSE,
      fill_color = "#998811",
      est_color = "#ffffff",
@@ -98,7 +98,7 @@ plot(fit,
   theme_Posterior
 
 plot(fit,
-     pars = c("delta_omega_prior", 'gamma_omega_prior'),
+     pars = c("mu_psi"),
      show_density = TRUE,
      fill_color = "#998811",
      est_color = "#ffffff",
@@ -111,17 +111,24 @@ color_scheme_set('viridisA')
 bayesplot_theme_set(theme_classic())
 
 draws = extract(fit)
-y = data_list$y
-yrep = draws$y_pred
-dim(yrep)
+y = data_list$Y
+str(y)
+yrep = draws$yp
+str(yrep)
+
+y =as.vector(Reshape(y, 1))
+yrep = Reshape(yrep, 1332)
+
+ncol(yrep)
+length(y)
 
 ppc_dens_overlay(y=y, yrep = yrep)
-ppc_ribbon(y[1:20], yrep[,1:20], prob_outer = 0.95, prob = 0.5, alpha = 0.4)
-ppc_intervals(y[1:2], yrep[,1:2], linewidth = 1)
+ppc_ribbon(y[1:1000], yrep[,1:1000], prob_outer = 0.95, prob = 0.5, alpha = 0.4)
+ppc_intervals(y[1:10], yrep[,1:10], linewidth = 1)
 #========= MSE ===========
 mses = c()
 for (i in 1:dim(yrep)[1]){
-    mses<-c(mses, mse(data_list$y, yrep[i,]))
+    mses<-c(mses, mse(y, yrep[i,]))
   }
 rmse = sqrt(mean(mses))
 rmse

@@ -73,5 +73,10 @@ model {
 }
 
 generated quantities {
-
+  matrix[N, P] yp;
+  real mse;
+  for (i in 1:N){
+    yp[i] = to_row_vector(multi_normal_rng(mu, Q));
+  }
+  mse = sqrt(squared_distance(to_vector(Y), to_vector(yp)) / (N*P));
 }
