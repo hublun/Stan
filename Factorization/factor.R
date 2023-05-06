@@ -18,19 +18,27 @@ remove(model)
 model = stan_model(paste0(getwd(),'/Documents/Github' ,
                           '/Stan/RStan/Models/factor_mvn.stan'))
 #------------------------------------------------------------------------
-init_func <- fun(){
+init_func <- function(D, P) {
   init.values <- list(
-    L_t <- rep(0, 24) + runif(1, -.1, .1),
-    L_d <- rep(.5, D) + runif(1, -.1, .1),
+    L_t = list(rep(0, 24) + runif(1, -.1, .1)),
+    L_d = list(rep(.5, D) + runif(1, -.1, .1)),
+    psi = list(rep(.2, P) + runif(1,-.1,.1)),
+    sigma_psi = list(0.15 + runif(1,-.1,.1)),
+    mu_psi = list(0.2 + runif(1, -.1, .1)),
+    sigma_lt = list(0.5 + runif(1, -.1,.1)),
+    mu_lt = list(0.0 + runif(1, -.1,.1))
   )
   
   return(init.values);
 }
+
+value <- init_func(data_list$D, data_list$P)
+class(value$L_t)
 #--------------------------------
 remove(fit)
 fit <- sampling(object = model,
                 data = data_list,
-                init = "random",
+                init = init_func(data_list$D, data_list$P), #"random",
                 control = list(adapt_delta = 0.95),
                 chains = 4,
                 iter = 888,
